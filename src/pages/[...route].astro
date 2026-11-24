@@ -1,0 +1,81 @@
+---
+// Pages des réussites et page « merci », dans les trois langues
+import Base from '../layouts/Base.astro';
+import Contact from '../components/Contact.astro';
+import { reussites, contact } from '../contenu';
+import { type Lang, langs, t, rich, home, reussitePath, merciPath } from '../lib/i18n';
+
+export function getStaticPaths() {
+  const paths: any[] = [];
+  for (const lang of langs) {
+    reussites.liste.forEach((r, i) => {
+      paths.push({ params: { route: reussitePath(lang, r.slug).replace(/^\/|\/$/g, '') }, props: { lang, type: 'reussite', index: i } });
+    });
+    paths.push({ params: { route: merciPath(lang).replace(/^\/|\/$/g, '') }, props: { lang, type: 'merci', index: 0 } });
+  }
+  return paths;
+}
+
+const { lang, type, index } = Astro.props as { lang: Lang; type: 'reussite' | 'merci'; index: number };
+const r = reussites.liste[index];
+const suivante = reussites.liste[(index + 1) % reussites.liste.length];
+const alts = Object.fromEntries(langs.map((l) => [l, type === 'merci' ? merciPath(l) : reussitePath(l, r.slug)])) as Record<Lang, string>;
+const b = reussites.blocs;
+---
+{type === 'reussite' ? (
+  <Base lang={lang} alts={alts} title={t(r.titre, lang)} description={t(r.resume, lang)}>
+    <article class="page sur-blanc">
+      <div class="wrap">
+        <a class="retour lien" href={`${home(lang)}#reussites`}>← {t(b.retour, lang)}</a>
+        <p class="entreprise">{r.entreprise}</p>
+        <h1 class="titre" data-split>{t(r.titre, lang)}</h1>
+        <p class="resume" data-fade>{t(r.resume, lang)}</p>
+        <div class={`visuel tx tx-${r.texture}`} data-fade>
+          <span class="tx-texte"><b>{t(r.visuelGrand, lang)}</b><i>{t(r.visuelPetit, lang)}</i></span>
+        </div>
+        <div class="blocs">
+          <section data-fade><h2>{t(b.contexte, lang)}</h2><p>{t(r.contexte, lang)}</p></section>
+          <section data-fade><h2>{t(b.role, lang)}</h2><p>{t(r.role, lang)}</p></section>
+          <section data-fade><h2>{t(b.resultat, lang)}</h2><p>{t(r.resultat, lang)}</p></section>
+        </div>
+      </div>
+    </article>
+    <a class="suivante sur-noir" href={reussitePath(lang, suivante.slug)}>
+      <span class="wrap">
+        <small>{t(b.suivante, lang)}</small>
+        <span class="titre titre-moyen">{t(suivante.titre, lang)}</span>
+      </span>
+    </a>
+    <Contact lang={lang} />
+  </Base>
+) : (
+  <Base lang={lang} alts={alts} title={t(contact.merci.titre, lang).replace(/\*/g, '')}>
+    <section class="merci sur-blanc">
+      <div class="wrap">
+        <h1 class="titre" data-split set:html={rich(contact.merci.titre, lang)} />
+        <p class="resume" data-fade>{t(contact.merci.texte, lang)}</p>
+        <a class="btn" href={home(lang)}>{t(contact.merci.retour, lang)}</a>
+      </div>
+    </section>
+  </Base>
+)}
+
+<style>
+  .page { padding-top: calc(var(--nav-h) + clamp(40px, 6vw, 80px)); padding-bottom: clamp(80px, 9vw, 130px); }
+  .retour { display: inline-block; margin-bottom: clamp(40px, 6vw, 80px); }
+  .entreprise { font-weight: 800; font-size: 14px; text-transform: uppercase; color: var(--bordeaux); margin-bottom: 14px; }
+  h1 { max-width: 14em; font-size: clamp(30px, 8.2vw, 96px); }
+  .resume { margin-top: 26px; max-width: 640px; font-size: clamp(18px, 1.5vw, 22px); color: #333; }
+  .visuel { aspect-ratio: 4 / 3; margin-top: clamp(48px, 6vw, 80px); }
+  @media (min-width: 760px) { .visuel { aspect-ratio: 16 / 7; } }
+  .blocs { display: grid; gap: 40px; margin-top: clamp(56px, 7vw, 100px); }
+  @media (min-width: 900px) { .blocs { grid-template-columns: repeat(3, 1fr); gap: 4vw; } }
+  .blocs h2 { font-family: var(--serif); font-weight: 400; font-style: italic; font-size: clamp(28px, 2.4vw, 36px); color: var(--bordeaux); margin-bottom: 12px; line-height: 1.1; }
+  .blocs p { color: #333; }
+  .suivante { display: block; padding-block: clamp(70px, 9vw, 120px); transition: background-color .4s var(--ease); }
+  .suivante:hover { background: #161616; }
+  .suivante small { display: block; font-weight: 800; font-size: 14px; text-transform: uppercase; opacity: .6; margin-bottom: 18px; }
+  .suivante .titre { display: block; max-width: 16em; }
+  .merci { min-height: 100svh; display: grid; align-items: center; padding-top: var(--nav-h); }
+  .merci .resume { margin-bottom: 36px; }
+</style>

@@ -1,0 +1,64 @@
+---
+import { site, contact } from '../contenu';
+import { type Lang, t, rich, merciPath } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section class="contact sur-bordeaux" id="contact">
+  <div class="wrap grille">
+    <div>
+      <h2 class="titre" data-split set:html={rich(contact.titre, lang)} />
+      <p class="intro" data-fade>{t(contact.texte, lang)}</p>
+      <div class="direct" data-fade>
+        <p>{t(contact.ouAussi, lang)}</p>
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+        <a href={site.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+
+    <form name="contact" method="POST" action={merciPath(lang)} data-netlify="true" netlify-honeypot="pot" class="form" data-fade>
+      <input type="hidden" name="form-name" value="contact" />
+      <input type="hidden" name="langue" value={lang} />
+      <p class="sr-only"><label>Ne pas remplir <input name="pot" tabindex="-1" autocomplete="off" /></label></p>
+      <label>
+        <span>{t(contact.champs.nom, lang)}</span>
+        <input name="nom" type="text" required autocomplete="name" />
+      </label>
+      <label>
+        <span>{t(contact.champs.email, lang)}</span>
+        <input name="email" type="email" required autocomplete="email" />
+      </label>
+      <label>
+        <span>{t(contact.champs.message, lang)}</span>
+        <textarea name="message" rows="4" required></textarea>
+      </label>
+      <button class="rond" type="submit">{t(contact.champs.envoyer, lang)}</button>
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact { padding-block: clamp(90px, 11vw, 160px); }
+  .grille { display: grid; gap: 56px; }
+  @media (min-width: 900px) { .grille { grid-template-columns: 1fr 1fr; gap: 7vw; align-items: start; } }
+  .intro { margin-top: 28px; max-width: 520px; font-size: clamp(17px, 1.35vw, 20px); color: #f1dde1; }
+  .direct { margin-top: 40px; display: grid; gap: 6px; justify-items: start; }
+  .direct p { font-weight: 800; font-size: 13px; text-transform: uppercase; opacity: .7; margin-bottom: 4px; }
+  .direct a { font-family: var(--serif); font-size: clamp(22px, 2vw, 30px); line-height: 1.2; border-bottom: 1px solid rgba(255,255,255,.4); overflow-wrap: anywhere; }
+  .direct a:hover { border-color: var(--blanc); }
+
+  .form { display: grid; gap: 26px; }
+  label span { display: block; font-weight: 800; font-size: 13px; text-transform: uppercase; opacity: .75; margin-bottom: 6px; }
+  input, textarea {
+    width: 100%; background: transparent; border: 0; border-bottom: 1.5px solid rgba(255,255,255,.45);
+    padding: 10px 0; font-size: 19px; color: var(--blanc); border-radius: 0; resize: vertical;
+  }
+  input:focus, textarea:focus { outline: none; border-bottom-color: var(--blanc); }
+  .rond {
+    justify-self: start; width: clamp(130px, 12vw, 160px); aspect-ratio: 1; border-radius: 50%; border: 0; margin-top: 8px;
+    background: var(--blanc); color: var(--noir); font-weight: 800; font-size: 15px; text-transform: uppercase; cursor: pointer;
+    transition: background-color .3s var(--ease), color .3s var(--ease), transform .5s var(--ease);
+  }
+  .rond:hover { background: var(--noir); color: var(--blanc); transform: scale(1.04); }
+  .rond:focus-visible { outline: 2px solid var(--blanc); outline-offset: 4px; }
+</style>

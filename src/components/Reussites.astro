@@ -1,0 +1,67 @@
+---
+import { reussites } from '../contenu';
+import { type Lang, t, rich, reussitePath } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const n = reussites.liste.length;
+---
+<!-- Cartes qui défilent à l'horizontale pendant qu'on scrolle vers le bas -->
+<section class="reussites sur-noir" id="reussites" data-pin="horizontal">
+  <div class="scene">
+    <div class="wrap entete">
+      <h2 class="titre titre-moyen" data-split set:html={rich(reussites.titre, lang)} />
+      <p class="compteur" aria-hidden="true"><span data-compteur>1</span> <i>{t(reussites.sur, lang)} {n}</i></p>
+    </div>
+    <div class="piste-zone" data-zone>
+      <ul class="piste" data-piste>
+        {reussites.liste.map((r) => (
+          <li class="carte">
+            <a href={reussitePath(lang, r.slug)}>
+              <span class={`visuel tx tx-${r.texture}`}>
+                <span class="tx-texte"><b>{t(r.visuelGrand, lang)}</b><i>{t(r.visuelPetit, lang)}</i></span>
+              </span>
+              <small>{r.entreprise}</small>
+              <h3>{t(r.titre, lang)}</h3>
+              <p>{t(r.resume, lang)}</p>
+              <span class="lire">{t(reussites.voir, lang)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .reussites { padding-block: clamp(90px, 11vw, 150px); }
+  .entete { width: 100%; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .compteur { font-weight: 800; font-size: 15px; text-transform: uppercase; white-space: nowrap; padding-bottom: 8px; }
+  .compteur i { font-style: normal; opacity: .45; }
+
+  /* Sans animation : défilement horizontal au doigt / à la molette */
+  .piste-zone { overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pad); scrollbar-width: none; margin-top: clamp(40px, 5vw, 70px); }
+  .piste-zone::-webkit-scrollbar { display: none; }
+  .piste { display: flex; gap: 18px; padding-inline: var(--pad); width: max-content; }
+  .carte { flex: 0 0 min(82vw, 520px); scroll-snap-align: start; }
+  .carte a { display: block; }
+  .visuel { display: block; aspect-ratio: 16 / 10; margin-bottom: 24px; transition: transform .8s var(--ease); }
+  .carte a:hover .visuel { transform: scale(.985); }
+  small { font-weight: 800; font-size: 13px; text-transform: uppercase; color: #9a9a9a; }
+  h3 { font-weight: 900; font-size: clamp(26px, 2.4vw, 34px); text-transform: uppercase; letter-spacing: -.03em; line-height: .98; margin: 10px 0 14px; }
+  p { color: var(--gris-fonce); max-width: 470px; }
+  .lire { display: inline-block; margin-top: 18px; font-weight: 800; font-size: 14px; text-transform: uppercase; border-bottom: 2px solid currentColor; padding-bottom: 3px; }
+  .carte a:hover .lire { color: var(--bordeaux-clair); }
+
+  /* Avec animation : la scène reste collée et la piste glisse */
+  :global(.js-motion) .reussites.pin-actif { padding: 0; height: var(--hauteur, 300vh); }
+  :global(.js-motion) .reussites.pin-actif .scene {
+    position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; justify-content: center;
+    padding-top: var(--nav-h); overflow: hidden;
+  }
+  :global(.js-motion) .reussites.pin-actif .piste-zone { overflow: visible; scroll-snap-type: none; }
+  :global(.js-motion) .reussites.pin-actif .piste { transform: translate3d(calc(var(--x, 0) * -1px), 0, 0); will-change: transform; }
+  @media (max-height: 760px) {
+    :global(.js-motion) .reussites.pin-actif .visuel { aspect-ratio: 16 / 8; margin-bottom: 16px; }
+    :global(.js-motion) .reussites.pin-actif .piste-zone { margin-top: 28px; }
+  }
+</style>

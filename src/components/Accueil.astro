@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from './Hero.astro';
+import Transition from './Transition.astro';
+import APropos from './APropos.astro';
+import Parcours from './Parcours.astro';
+import Reussites from './Reussites.astro';
+import Competences from './Competences.astro';
+import Contact from './Contact.astro';
+import { type Lang, home } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const alts = { fr: home('fr'), nl: home('nl'), en: home('en') };
+---
+<Base lang={lang} alts={alts} accueil>
+  <Hero lang={lang} />
+  <Transition lang={lang} />
+  <APropos lang={lang} />
+  <Parcours lang={lang} />
+  <Reussites lang={lang} />
+  <Competences lang={lang} />
+  <Contact lang={lang} />
+</Base>

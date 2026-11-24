@@ -1,0 +1,31 @@
+---
+import { site, menu } from '../contenu';
+import { type Lang, t, home } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const annee = new Date().getFullYear();
+---
+<footer class="pied sur-noir">
+  <div class="wrap">
+    <p class="nom">Catherine <i>Caristo</i></p>
+    <div class="bas">
+      <p>{site.titre}</p>
+      <ul>
+        <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+        <li><a href={site.linkedin} target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href={`${home(lang)}#haut`}>{t(menu.haut, lang)}</a></li>
+      </ul>
+    </div>
+    <p class="copy">© {annee} {site.nom}</p>
+  </div>
+</footer>
+
+<style>
+  .pied { padding-block: clamp(70px, 9vw, 120px) 32px; }
+  .nom { font-family: var(--serif); font-size: clamp(56px, 11vw, 190px); line-height: .95; letter-spacing: -.01em; }
+  .bas { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px; margin-top: 48px; padding-top: 24px; border-top: 1px solid #2a2a2a; font-weight: 600; }
+  .bas ul { display: flex; flex-wrap: wrap; gap: 14px 28px; }
+  .bas a { opacity: .75; transition: opacity .2s; }
+  .bas a:hover { opacity: 1; }
+  .copy { margin-top: 40px; font-size: 14px; color: #777; }
+</style>

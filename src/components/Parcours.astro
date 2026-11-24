@@ -1,0 +1,63 @@
+---
+import { parcours } from '../contenu';
+import { type Lang, t, rich } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const premiere = parcours.etapes[0].annee;
+---
+<!-- Frise qui se déroule : la ligne se remplit au scroll, l'année à gauche suit l'étape lue -->
+<section class="parcours sur-blanc" id="parcours" data-parcours>
+  <div class="wrap">
+    <h2 class="titre titre-moyen" data-split set:html={rich(parcours.titre, lang)} />
+    <div class="frise">
+      <div class="annee-col" aria-hidden="true">
+        <span class="annee" data-annee>{premiere}</span>
+      </div>
+      <div class="etapes-zone">
+      <span class="ligne" aria-hidden="true"><span class="ligne-pleine" data-ligne></span></span>
+      <ol class="etapes" data-etapes>
+        {parcours.etapes.map((e, i) => (
+          <li id={`etape-${e.id}`} data-etape data-annee-etape={e.annee} class:list={['etape', { active: i === 0 }]}>
+            <p class="periode">{t(e.periode, lang)}</p>
+            <h3>{t(e.role, lang)}</h3>
+            <p class="lieu">{t(e.lieu, lang)}</p>
+            <p class="desc">{t(e.texte, lang)}</p>
+          </li>
+        ))}
+      </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .parcours { padding-block: clamp(90px, 11vw, 160px); }
+  .frise { display: grid; margin-top: clamp(48px, 6vw, 90px); }
+  @media (min-width: 900px) { .frise { grid-template-columns: 1fr 1.25fr; gap: 6vw; } }
+  .annee-col { display: none; }
+  @media (min-width: 900px) {
+    .annee-col { display: block; }
+    .annee {
+      position: sticky; top: calc(50vh - 0.5em); display: block;
+      font-family: var(--serif); font-size: clamp(120px, 15vw, 240px); line-height: 1; color: var(--bordeaux);
+      transition: opacity .35s var(--ease);
+    }
+  }
+  .etapes-zone { position: relative; }
+  .etapes { position: relative; padding-left: 34px; display: grid; gap: clamp(56px, 8vh, 96px); padding-block: 8px; }
+  .ligne { position: absolute; left: 4px; top: 12px; bottom: 12px; width: 2px; background: #e6e4e0; }
+  .ligne-pleine { position: absolute; inset: 0; background: var(--bordeaux); transform-origin: top; transform: scaleY(var(--remplir, 1)); }
+  .etape { position: relative; transition: opacity .5s var(--ease); }
+  .etape::before {
+    content: ""; position: absolute; left: -35px; top: 8px; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--blanc); box-shadow: inset 0 0 0 2px var(--bordeaux); transition: background-color .4s;
+  }
+  .etape.active::before { background: var(--bordeaux); }
+  .periode { font-weight: 800; font-size: 14px; text-transform: uppercase; color: var(--bordeaux); }
+  h3 { font-weight: 900; text-transform: uppercase; letter-spacing: -.03em; line-height: 1; font-size: clamp(26px, 2.6vw, 40px); margin-top: 10px; }
+  .lieu { font-family: var(--serif); font-style: italic; font-size: 22px; margin-top: 8px; color: var(--gris); }
+  .desc { margin-top: 14px; max-width: 560px; color: #333; }
+
+  :global(.js-motion) .ligne-pleine { --remplir: 0; }
+  :global(.js-motion) .etape:not(.active):not(.passee) { opacity: .35; }
+</style>

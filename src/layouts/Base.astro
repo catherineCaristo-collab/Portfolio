@@ -1,0 +1,54 @@
+---
+import '@fontsource/inter-tight/400.css';
+import '@fontsource/inter-tight/600.css';
+import '@fontsource/inter-tight/800.css';
+import '@fontsource/inter-tight/900.css';
+import '@fontsource/instrument-serif/400.css';
+import '@fontsource/instrument-serif/400-italic.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site, menu } from '../contenu';
+import { type Lang, t } from '../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  alts: Record<Lang, string>;
+  accueil?: boolean;
+}
+const { lang, title, description, alts, accueil = false } = Astro.props;
+const pageTitle = title ? `${title} · ${site.nom}` : `${site.nom} · ${site.titre}`;
+const desc = description ?? t(site.description, lang);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <meta name="theme-color" content="#0b0b0b" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {Object.entries(alts).map(([l, href]) => <link rel="alternate" hreflang={l} href={href} />)}
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('js-motion');
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#contenu">{t(menu.passerAuContenu, lang)}</a>
+    <Nav lang={lang} alts={alts} accueil={accueil} />
+    <main id="contenu">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import photo from '../assets/catherine.jpg';
+import { site, aPropos } from '../contenu';
+import { type Lang, t, rich } from '../lib/i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+---
+<section class="apropos sur-noir" id="a-propos">
+  <div class="wrap grille">
+    <div class="texte">
+      <h2 class="titre titre-moyen" data-split set:html={rich(aPropos.titre, lang)} />
+      <div class="paras">
+        {aPropos.paragraphes.map((p) => <p data-fade>{t(p, lang)}</p>)}
+      </div>
+    </div>
+    <figure class="portrait" data-fade>
+      <Image src={photo} alt={site.nom} widths={[360, 520]} sizes="(min-width: 900px) 30vw, 80vw" />
+    </figure>
+  </div>
+  <ul class="wrap reperes" id="en-bref">
+    {aPropos.reperes.map((r) => (
+      <li data-fade><b>{r.grand}</b><span>{t(r.petit, lang)}</span></li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .apropos { padding-block: clamp(90px, 11vw, 160px) clamp(70px, 9vw, 130px); }
+  .grille { display: grid; gap: 48px; align-items: end; }
+  @media (min-width: 900px) { .grille { grid-template-columns: 1.35fr 1fr; gap: 8vw; } }
+  .paras { margin-top: clamp(28px, 3.5vw, 48px); max-width: 600px; display: grid; gap: 18px; color: #d9d9d9; font-size: clamp(17px, 1.35vw, 20px); }
+  .portrait { border-radius: var(--radius); overflow: hidden; aspect-ratio: 4 / 5; max-width: 460px; }
+  .portrait :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 25%; filter: grayscale(1) contrast(1.08); }
+  .reperes {
+    display: grid; gap: 28px; margin-top: clamp(70px, 9vw, 130px);
+    padding-top: 36px; border-top: 1px solid #2a2a2a;
+  }
+  @media (min-width: 700px) { .reperes { grid-template-columns: repeat(3, 1fr); } }
+  .reperes b { display: block; font-family: var(--serif); font-weight: 400; font-size: clamp(56px, 6vw, 96px); line-height: 1; }
+  .reperes span { display: block; margin-top: 10px; color: var(--gris-fonce); font-size: 16px; }
+</style>
